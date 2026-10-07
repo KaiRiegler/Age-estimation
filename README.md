@@ -26,8 +26,8 @@ age-estimation-cnn/
 Requires [uv](https://docs.astral.sh/uv/).
 
 ```
-git clone <repo-url>
-cd age-estimation-cnn
+git clone https://github.com/KaiRiegler/Age-estimation.git
+cd Age-estimation
 uv sync
 ```
 
@@ -43,12 +43,12 @@ Without an NVIDIA GPU everything still runs, just on the CPU.
 ## Usage
 
 ```
-uv run age-download                  # download and extract UTKFace into data/ (107 MB)
-uv run age-train --epochs 20         # train, saves weights to models/
-uv run age-train --num-workers 0     # if parallel data loading causes trouble
-uv run age-predict path/to/face.jpg  # predict the age for one image
-uv run jupyter lab                   # open the notebook
-uv run pytest                        # run the tests
+uv run src/age_estimation/data.py                        # download and extract UTKFace into data/ (107 MB)
+uv run src/age_estimation/train.py                       # train, saves weights to models/
+uv run src/age_estimation/train.py --num-workers 0       # if parallel data loading causes trouble
+uv run src/age_estimation/predict.py <path/to/face.jpg>  # predict the age for one image
+uv run jupyter lab                                       # open the notebook
+uv run pytest                                            # run the tests
 ```
 
 ## Model
@@ -67,7 +67,22 @@ optimizer: RMSprop. Data split: 80 % training, 10 % validation, 10 % test.
 
 ## Results
 
-_To be filled in after training: test MAE and the loss curve from the notebook._
+Trained for 20 epochs with the default settings (batch size 64, learning rate 0.001, seed 42)
+on an NVIDIA RTX 2080 Super.
+
+| Model | Test MAE (years) |
+|---|---|
+| Baseline (always predicting the median age) | 15.42 |
+| **CNN** | **7.58** |
+
+On average, the predicted age is off by about 7.6 years on images the model has never seen,
+roughly half the error of the baseline.
+
+![Loss curve](images/loss_curve.png)
+
+Training and validation error stay close together, so the model is not overfitting.
+The training error was still decreasing after 20 epochs, so longer training or a larger
+network would likely improve the result further.
 
 ## Data
 
